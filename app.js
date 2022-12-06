@@ -6,6 +6,7 @@ const { urlencoded } = require('body-parser');
 
 const rotaRFID = require("./routes/RFIDS");
 const rotaMovimentacao = require("./routes/movimentacao");
+const rotaLogs = require("./routes/log");
 
 const app = express();
 app.use(cors())
@@ -31,6 +32,7 @@ app.use((req,res,next) => {
 
 app.use("/RFID",rotaRFID)
 app.use("/movimentacao",rotaMovimentacao)
+app.use("/log",rotaLogs)
 
 app.use("/teste",(req,res) => {
   res.send("teste")

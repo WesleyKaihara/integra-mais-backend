@@ -31,6 +31,7 @@ router.get("/isAtivo/:RFID" ,(req,res,next) => {
 
 router.get("/ativos", (req, res, next) => {
 
+
   mysql.getConnection((error, conn) => {
     if (error) {
       return res.status(500).send({
@@ -39,11 +40,17 @@ router.get("/ativos", (req, res, next) => {
     }
     conn.query(
       `SELECT 
-          * 
-        FROM 
-          FUNCIONARIO F 
-        LEFT JOIN MOVIMENTACAO M
-          ON F.RFID = M.RFID WHERE SITUACAO = 1;`,
+            F.RFID,
+            F.MATRICULA,
+            F.NOME,F.SETOR,
+            F.ANDAR,
+            M.SITUACAO,
+            M.ANDAR_ATUAL,
+            DATE_FORMAT(M.HORARIO, '%d/%m/%Y %T') as HORARIO
+          FROM 
+            FUNCIONARIO F 
+          INNER JOIN MOVIMENTACAO M
+      ON F.RFID = M.RFID `,
       (error, resultado) => {
         conn.release();
 
@@ -101,7 +108,7 @@ router.put("/atualizar", (req, res, next) => {
       })
     }
     conn.query(
-      `UPDATE MOVIMENTACAO SET SITUACAO = NOT(SITUACAO) WHERE RFID = ?`,
+      `UPDATE MOVIMENTACAO SET SITUACAO = NOT(SITUACAO),HORARIO =  SYSDATE()  WHERE RFID = ?;`,
               [req.body.RFID],
       (error, resultado) => {
         conn.release();
@@ -117,6 +124,9 @@ router.put("/atualizar", (req, res, next) => {
         });
       }
     );
+
   });
 });
+
+
 module.exports = router;
